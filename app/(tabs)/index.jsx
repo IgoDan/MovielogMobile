@@ -22,45 +22,46 @@ const index = () => {
   }, [timeWindow]);
 
   return (
-    <View className="flex-1 bg-gray-900 px-4 py-6">
-
-      <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-lg font-bold text-white uppercase">Trending</Text>
-        <View className="flex-row items-center border border-gray-500 rounded-full">
-          <TouchableOpacity
-            className={`px-4 py-2 rounded-full ${
-              timeWindow === 'day' ? 'bg-gray-700' : ''
-            }`}
-            onPress={() => setTimeWindow('day')}
-          >
-            <Text className="text-white">Day</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className={`px-4 py-2 rounded-full ${
-              timeWindow === 'week' ? 'bg-gray-700' : ''
-            }`}
-            onPress={() => setTimeWindow('week')}
-          >
-            <Text className="text-white">Week</Text>
-          </TouchableOpacity>
+    <View className="flex-1 bg-gray-900 px-4 py-4">
+      <View className="flex-column items-center px-4">
+        <View className="flex-row items-center justify-between mb-4 gap-8">
+          <Text className="text-lg font-bold text-white uppercase">Trending</Text>
+          <View className="flex-row items-center border border-gray-500 rounded-full">
+            <TouchableOpacity
+              className={`px-4 py-2 rounded-full ${
+                timeWindow === 'day' ? 'bg-gray-700' : ''
+              }`}
+              onPress={() => setTimeWindow('day')}
+            >
+              <Text className="text-white">Day</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-4 py-2 rounded-full ${
+                timeWindow === 'week' ? 'bg-gray-700' : ''
+              }`}
+              onPress={() => setTimeWindow('week')}
+            >
+              <Text className="text-white">Week</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#63b3ed" />
-      ) : (
-        <FlatList
-          data={data}
-          numColumns={1}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-              <CardComponent key={item.id} item={item} type={item.media_type} />
-          )}
-          contentContainerStyle={{
-            paddingBottom: 20,
-          }}
-        />
-      )}
+        {loading ? (
+          <ActivityIndicator size="large" color="#63b3ed" />
+        ) : (
+          <FlatList
+            data={data}
+            numColumns={1}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+                <CardComponent key={item.id} item={item} type={item.media_type} />
+            )}
+            contentContainerStyle={{
+              paddingBottom: 20,
+            }}
+          />
+        )}
+      </View>
     </View>
   );
 };

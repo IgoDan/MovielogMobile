@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../../utils/helper";
 import { useAuth } from "../../../context/useAuth";
 import StarRating from "../../../widgets/StarRating";
+import CircularProgress from 'react-native-circular-progress-indicator'
 
 
 export default function Details() {
@@ -182,20 +183,39 @@ export default function Details() {
 
             <View className="flex flex-row mb-6">
               <View className="flex items-center ml-4 mr-4">
-                <View className={`w-16 h-16 rounded-full flex items-center justify-center bg-gray-800`}>
-                  <Text className="text-lg font-bold text-white">
-                    {ratingToPercentage(details?.vote_average)}%
-                  </Text>
-                </View>
+                <CircularProgress
+                  //{ratingToPercentage(details?.vote_average)}
+                  value={50}
+                  radius={35}
+                  duration={200}
+                  progressValueColor={'#ecf0f1'}
+                  maxValue={100}
+                  titleColor={'white'}
+                  titleStyle={{fontWeight: 'bold'}}
+                  valueSuffix={'%'}
+                  activeStrokeColor={'#0284c7'}
+                  activeStrokeSecondaryColor={'#082f49'}
+                />
                 <Text className="text-white mt-2 font-bold">TMDB</Text>
               </View>
 
               <View className="flex items-center ml-4 mr-4">
-                <View className={`w-16 h-16 rounded-full flex items-center justify-center bg-gray-800`}>
-                  <Text className="text-lg font-bold text-white">
-                    {/* {averageRating / 10} */}{10}
-                  </Text>
-                </View>
+                <CircularProgress
+                  //{averageRating / 10}
+                  value={5}
+                  radius={35}
+                  duration={100}
+                  progressValueColor={'#ecf0f1'}
+                  maxValue={10}
+                  titleColor={'white'}
+                  titleStyle={{fontWeight: 'bold'}}
+                  progressFormatter={(value) => {
+                    'worklet';                   
+                    return value.toFixed(1);
+                  }}
+                  activeStrokeColor={'#0284c7'}
+                  activeStrokeSecondaryColor={'#082f49'}
+                />
                 <Text className="text-white mt-2 font-bold">MOVIELOG</Text>
               </View>
             </View>

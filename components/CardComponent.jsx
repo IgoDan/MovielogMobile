@@ -12,14 +12,12 @@ const CardComponent = ({ item, type }) => {
       <Link href={`/${type}/${item?.id}`}>  
       <Image
         source={{ uri: `${imagePath}/${item?.poster_path}` }}
-        style={{ height: 300 }}
+        style={{ height: 250 }}
         className="w-full"
         resizeMode="cover"
       />
 
-      <View
-        className="absolute bottom-0 left-0 w-full bg-black bg-opacity-80 p-3"
-      >
+      <View className=" w-full bg-black py-3 px-3">
         <Text className="text-white font-bold text-center text-lg" numberOfLines={1}>
           {item?.title || item?.name}
         </Text>
