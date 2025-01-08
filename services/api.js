@@ -1,11 +1,10 @@
 import axios from "axios"
-import Constants from 'expo-constants';
 
 export const imagePath = "https://image.tmdb.org/t/p/w500";
 export const imagePathOriginal = "https://image.tmdb.org/t/p/original";
 
 const baseUrl = "https://api.themoviedb.org/3";
-const apiKey = Constants.expoConfig.extra.apiKey;
+const apiKey = process.env.EXPO_PUBLIC_API_KEY;
 
 // Trending movies and tv series
 export const fetchTrending = async (timeWindow = "day") => {

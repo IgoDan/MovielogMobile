@@ -12,8 +12,6 @@
       "supportsTablet": true
     },
     "android": {
-      "googleServicesFile": "google-services.json",
-      "package": "com.project.movielog",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,7 +23,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "@react-native-firebase/app",
       "expo-router",
       [
         "expo-splash-screen",

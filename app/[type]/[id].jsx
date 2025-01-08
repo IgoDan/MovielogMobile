@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, FlatList } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchDetails, fetchCredits, imagePath, imagePathOriginal } from "../../../services/api";
+import { fetchDetails, fetchCredits, imagePath, imagePathOriginal } from "../../services/api";
 import { LinearGradient } from 'expo-linear-gradient'
-import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../../utils/helper";
-import { useAuth } from "../../../context/useAuth";
-import StarRating from "../../../widgets/StarRating";
+import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../utils/helper";
+import { useAuth } from "../../context/useAuth";
+import StarRating from "../../widgets/StarRating";
 import CircularProgress from 'react-native-circular-progress-indicator'
 
 
