@@ -1,9 +1,11 @@
-// import { db } from "../services/firebase";
-// import { collection, addDoc, doc, setDoc, getDoc, deleteDoc, updateDoc, getDocs, runTransaction  } from 'firebase/firestore'
-// import Toast from "react-native-toast-message";
-// import { useCallback } from "react";
+import { db } from "../services/firebase";
+import { collection, addDoc, doc, setDoc, getDoc, deleteDoc, updateDoc, getDocs, runTransaction  } from 'firebase/firestore'
+import Toast from "react-native-toast-message";
+import { useCallback } from "react";
 
-// export const useFirestore = () => {
+export const useFirestore = () => {
+
+        const addUser = async 
 
 //     const addToWatchlist = async (userId, dataId, data) => {
 //         if (await checkIfInWatchlist(userId, dataId)){
@@ -227,4 +229,4 @@
 //         getWatchlist,
 //         fetchAverageRating
 //     };
-// };
+};

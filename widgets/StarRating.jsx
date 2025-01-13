@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Używamy ikon z expo
 
-export default function StarRating({ rating, setRating, count = 5, size = 25 }) {
+export default function StarRating({ rating, setRating, count = 5, size = 28 }) {
   const [hover, setHover] = useState(null);
 
   return (

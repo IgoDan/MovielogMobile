@@ -5,16 +5,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { fetchDetails, fetchCredits, imagePath, imagePathOriginal } from "../../services/api";
 import { LinearGradient } from 'expo-linear-gradient'
 import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../utils/helper";
-import { useAuth } from "../../context/useAuth";
 import StarRating from "../../widgets/StarRating";
 import CircularProgress from 'react-native-circular-progress-indicator'
+import auth from "../../services/firebase";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 
 export default function Details() {
 
   const { type, id } = useLocalSearchParams();
 
-  // const { user } = useAuth();
   // const {
   //   addToWatchlist,
   //   checkIfInWatchlist,
@@ -55,30 +55,31 @@ export default function Details() {
     fetchData();
   }, [type, id]);
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     setIsInWatchlist(false);
-  //     return;
-  //   }
+  useEffect(() => {
+    setReview(user.uid ? user.uid : "AAAAAAAAAAAAA");
+    if (!user) {
+      setIsInWatchlist(false);
+      return;
+    }
 
-  //   const dataId = createId(id, type);
-  //   checkIfInWatchlist(user?.uid, dataId).then(setIsInWatchlist);
+    const dataId = createId(id, type);
+    checkIfInWatchlist(user?.uid, dataId).then(setIsInWatchlist);
 
-  //   fetchWatchlistElement(user?.uid, dataId).then((watchlistElement) => {
-  //     if (watchlistElement) {
-  //       setInitialRating(watchlistElement.user_rating);
-  //       setInitialReview(watchlistElement.user_review);
-  //       setRating(watchlistElement.user_rating);
-  //       setReview(watchlistElement.user_review);
-  //     }
-  //   });
+    fetchWatchlistElement(user?.uid, dataId).then((watchlistElement) => {
+      if (watchlistElement) {
+        setInitialRating(watchlistElement.user_rating);
+        setInitialReview(watchlistElement.user_review);
+        setRating(watchlistElement.user_rating);
+        setReview(watchlistElement.user_review);
+      }
+    });
 
-  //   fetchAverageRating(dataId).then((averageRatingData) => {
-  //     if (averageRatingData) {
-  //       setAverageRating(averageRatingData.averageRating);
-  //     }
-  //   });
-  // }, [id, user]);
+    fetchAverageRating(dataId).then((averageRatingData) => {
+      if (averageRatingData) {
+        setAverageRating(averageRatingData.averageRating);
+      }
+    });
+  }, [id, user]);
 
   // useEffect(() => {
   //   if (rating !== initialRating || review !== initialReview) {

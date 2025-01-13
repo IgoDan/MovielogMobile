@@ -1,66 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, Alert, ActivityIndicator} from "react-native";
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import auth from "../../services/firebase";
+import { useAuth } from "../../context/useAuth";
 
 const Profile = () => {
+  const { user, login, logout, register, loading} = useAuth();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(loading);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    setIsLoading(true);
+    if (user) {
       setIsLoggedIn(true);
-      setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const registerAndGoToMainFlow = async () => {
-    if (email && password) {
-      try {
-        setIsLoading(true);
-        await createUserWithEmailAndPassword(auth, email, password);
-
-        Alert.alert("Success", "Registration successful");
-      } catch (e) {
-        Alert.alert("Error", e.message);
-      } finally {
-        setIsLoading(false);
-      }
     }
-  };
-
-  const loginAndGoToMainFlow = async () => {
-    if (email && password) {
-      try {
-        setIsLoading(true);
-        await signInWithEmailAndPassword(auth, email, password);
-        Alert.alert("Success", "Login successful");
-      } catch (e) {
-        Alert.alert("Error", e.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const logout = async () => {
-    try {
-      setIsLoading(true);
-      await signOut(auth);
-      Alert.alert("Success", "You have been logged out.");
-    } catch (e) {
-      Alert.alert("Error", e.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setIsLoading(false);
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -80,7 +38,17 @@ const Profile = () => {
           </Text>
         </View>
         <Pressable
-          onPress={logout}
+          onPress={async () => {
+            try {
+              setIsLoading(true);
+              await logout();
+              setIsLoggedIn(true);
+            } catch (error) {
+              console.error("Error while logging out:", error);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
           style={{
             backgroundColor: "#4A5568", // gray-600
             paddingVertical: 12,
@@ -96,7 +64,7 @@ const Profile = () => {
           </Text>
         </Pressable>
         <View className="mt-8">
-          {/* Dodaj swoje komponenty tutaj */}
+          {/* TODO */}
         </View>
       </View>
     );
@@ -132,7 +100,17 @@ const Profile = () => {
               secureTextEntry
             />
             <Pressable
-              onPress={registerAndGoToMainFlow}
+              onPress={async () => {
+                try {
+                  setIsLoading(true);
+                  await register(email, password);
+                  setIsLoggedIn(true);
+                } catch (error) {
+                  console.error("Error while registering:", error);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
               style={{
                 backgroundColor: '#2a4365', // blue-600
                 paddingVertical: 12,
@@ -184,7 +162,17 @@ const Profile = () => {
             secureTextEntry
           />
           <Pressable
-            onPress={loginAndGoToMainFlow}
+            onPress={async () => {
+              try {
+                setIsLoading(true);
+                await login(email, password);
+                setIsLoggedIn(true);
+              } catch (error) {
+                console.error("Error while logging in:", error);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
             style={{
               backgroundColor: '#2a4365', // blue-600
               paddingVertical: 12,
