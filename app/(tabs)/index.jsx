@@ -57,7 +57,7 @@ const index = () => {
                 <CardComponent key={item.id} item={item} type={item.media_type} />
             )}
             contentContainerStyle={{
-              paddingBottom: 20,
+              paddingBottom: 50,
             }}
           />
         )}

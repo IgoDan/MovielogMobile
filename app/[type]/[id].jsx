@@ -3,7 +3,6 @@ import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Tex
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchDetails, fetchCredits, imagePath, imagePathOriginal } from "../../services/api";
-import { LinearGradient } from 'expo-linear-gradient'
 import StarRating from "../../widgets/StarRating";
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { useAuth } from "../../context/useAuth";
@@ -193,8 +192,7 @@ export default function Details() {
             <View className="flex flex-row mb-6">
               <View className="flex items-center ml-4 mr-4">
                 <CircularProgress
-                  {...ratingToPercentage(details?.vote_average)}
-                  value={50}
+                  value={ratingToPercentage(details?.vote_average)}
                   radius={35}
                   duration={200}
                   progressValueColor={'#ecf0f1'}
@@ -248,8 +246,8 @@ export default function Details() {
                 className="bg-green-600 p-2 rounded-md flex flex-row items-center"
                 onPress={handleRemoveFromWatchlist}
               >
-                <Ionicons name="checkmark-circle" size={20} color="white" />
-                <Text className="text-white ml-2">In watchlist</Text>
+                <Ionicons name="checkmark-circle" size={25} color="white" />
+                <Text className="text-white text-md font-bold ml-2">In watchlist</Text>
               </TouchableOpacity>
             )}
             {!isInWatchlist && (
@@ -258,16 +256,16 @@ export default function Details() {
                 onPress={handleSaveToWatchlist}
               >
                 <Ionicons name="add-circle" size={25} color="white" />
-                <Text className="text-white ml-2">Add to watchlist</Text>
+                <Text className="text-white text-md font-bold ml-2">Add to watchlist</Text>
               </TouchableOpacity>
             )}
             {isInWatchlist && isUpdated && (
               <TouchableOpacity
-                className="border border-blue-600 p-2 rounded-md flex flex-row items-center"
+                className="bg-blue-600 p-2 rounded-md flex flex-row items-center"
                 onPress={handleUpdateWatchlist}
               >
-                <Ionicons name="refresh-circle" size={20} color="white" />
-                <Text className="text-blue-600 ml-2">Update changes</Text>
+                <Ionicons name="refresh-circle" size={25} color="white" />
+                <Text className="text-white text-md font-bold ml-2">Update changes</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -297,8 +295,6 @@ export default function Details() {
           </View>
         </View>
 
-
-
         <View className="container py-4 gap-2">
           <Text className="text-lg text-gray-400 font-bold text-center">Cast</Text>
           <ScrollView horizontal className="mt-4 flex flex-row gap-4">
@@ -313,7 +309,7 @@ export default function Details() {
                   {item?.original_name}
                 </Text>
                 <Text className="text-center text-white">as</Text>
-                <Text className="text-center text-white font-bold">
+                <Text className="text-center text-white font-bold mb-10">
                   {item?.character}
                 </Text>
               </View>
