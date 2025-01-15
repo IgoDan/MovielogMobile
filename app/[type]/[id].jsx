@@ -4,25 +4,18 @@ import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchDetails, fetchCredits, imagePath, imagePathOriginal } from "../../services/api";
 import { LinearGradient } from 'expo-linear-gradient'
-import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../utils/helper";
 import StarRating from "../../widgets/StarRating";
 import CircularProgress from 'react-native-circular-progress-indicator'
-import auth from "../../services/firebase";
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-
+import { useAuth } from "../../context/useAuth";
+import { useFirestore } from "../../services/firestore";
+import { ratingToPercentage, averageRatingFormat, resolveRatingColor, createId } from "../../utils/helper";
+import Toast from "react-native-toast-message";
 
 export default function Details() {
 
+  const { user } = useAuth();
   const { type, id } = useLocalSearchParams();
-
-  // const {
-  //   addToWatchlist,
-  //   checkIfInWatchlist,
-  //   removeFromWatchlist,
-  //   updateWatchlist,
-  //   fetchWatchlistElement,
-  //   fetchAverageRating,
-  // } = useFirestore();
+  const { addToWatchlist, checkIfInWatchlist, removeFromWatchlist, updateWatchlist, fetchWatchlistElement, fetchAverageRating } = useFirestore();
 
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState({});
@@ -45,94 +38,109 @@ export default function Details() {
 
         setDetails(detailsData);
         setCast(creditsData?.cast?.slice(0, 10));
+
+        console.log(details, 'details');
+        console.log(cast, 'cast');
       } catch (error) {
-        console.error(error);
+        console.log(error, 'error');
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchData();
   }, [type, id]);
 
   useEffect(() => {
-    setReview(user.uid ? user.uid : "AAAAAAAAAAAAA");
     if (!user) {
       setIsInWatchlist(false);
       return;
+    } else {
+      const dataId = createId(id, type);
+      checkIfInWatchlist(user?.uid, dataId).then((data) => {
+        setIsInWatchlist(data);
+      });
+      fetchWatchlistElement(user?.uid, dataId).then((watchlistElement) => {
+        if (watchlistElement) {
+          setInitialRating(watchlistElement.user_rating);
+          setInitialReview(watchlistElement.user_review);
+          setRating(watchlistElement.user_rating);
+          setReview(watchlistElement.user_review);
+        }
+      });
+
+      fetchAverageRating(dataId).then((averageRatingData) => {
+        if (averageRatingData) {
+          setAverageRating(averageRatingData.averageRating);
+        }
+      });
+    }
+  }, [id, user])
+
+  useEffect(() => {
+    if (rating !== initialRating || review !== initialReview) {
+      setIsUpdated(true);
+    }
+  }, [review, rating]);
+
+  const handleSaveToWatchlist = async () => {
+    if (!user) {
+      Toast.show({
+        type: "info",
+        text1: "User not logged in",
+        text2: "Register/Login to add movies to watchlist",
+        position: "top",
+      });
+
+      return;
     }
 
-    const dataId = createId(id, type);
-    checkIfInWatchlist(user?.uid, dataId).then(setIsInWatchlist);
+    const data = {
+      id: details?.id,
+      title: details?.title || details?.name,
+      type: type,
+      poster_path: details?.poster_path,
+      release_date: details?.release_date || details?.first_air_date,
+      vote_average: details?.vote_average,
+      user_rating: rating,
+      user_review: review
+    }
 
-    fetchWatchlistElement(user?.uid, dataId).then((watchlistElement) => {
-      if (watchlistElement) {
-        setInitialRating(watchlistElement.user_rating);
-        setInitialReview(watchlistElement.user_review);
-        setRating(watchlistElement.user_rating);
-        setReview(watchlistElement.user_review);
-      }
-    });
+    const dataId = createId(details?.id, type);
+    await addToWatchlist(user?.uid, dataId, data);
 
-    fetchAverageRating(dataId).then((averageRatingData) => {
-      if (averageRatingData) {
-        setAverageRating(averageRatingData.averageRating);
-      }
-    });
-  }, [id, user]);
+    const watchlistState = await checkIfInWatchlist(user?.uid, dataId);
+    setIsInWatchlist(watchlistState);
+    setIsUpdated(false);
+  }
 
-  // useEffect(() => {
-  //   if (rating !== initialRating || review !== initialReview) {
-  //     setIsUpdated(true);
-  //   }
-  // }, [review, rating]);
+  const handleRemoveFromWatchlist = async () => {
+    const dataId = createId(details?.id, type);
+    await removeFromWatchlist(user?.uid, dataId);
 
-  // const handleSaveToWatchlist = async () => {
-  //   if (!user) {
-  //     alert("Login to add to watchlist");
-  //     return;
-  //   }
+    const watchlistState = await checkIfInWatchlist(user?.uid, dataId);
+    setIsInWatchlist(watchlistState);
 
-  //   const data = {
-  //     id: details?.id,
-  //     title: details?.title || details?.name,
-  //     type: type,
-  //     poster_path: details?.poster_path,
-  //     release_date: details?.release_date || details?.first_air_date,
-  //     vote_average: details?.vote_average,
-  //     user_rating: rating,
-  //     user_review: review,
-  //   };
+    setInitialRating(0);
+    setInitialReview("");
+    setRating(0);
+    setReview("");
+  }
 
-  //   const dataId = createId(details?.id, type);
-  //   await addToWatchlist(user?.uid, dataId, data);
-  //   setIsInWatchlist(await checkIfInWatchlist(user?.uid, dataId));
-  //   setIsUpdated(false);
-  // };
+  const handleUpdateWatchlist = async () => {
+    const dataId = createId(details?.id, type);
 
-  // const handleRemoveFromWatchlist = async () => {
-  //   const dataId = createId(details?.id, type);
-  //   await removeFromWatchlist(user?.uid, dataId);
-  //   setIsInWatchlist(await checkIfInWatchlist(user?.uid, dataId));
-  //   setInitialRating(0);
-  //   setInitialReview("");
-  //   setRating(0);
-  //   setReview("");
-  // };
+    const updatedData = {
+      user_rating: rating,
+      user_review: review,
+    };
 
-  // const handleUpdateWatchlist = async () => {
-  //   const dataId = createId(details?.id, type);
+    await updateWatchlist(user?.uid, dataId, updatedData);
 
-  //   const updatedData = {
-  //     user_rating: rating,
-  //     user_review: review,
-  //   };
-
-  //   await updateWatchlist(user?.uid, dataId, updatedData);
-  //   setInitialRating(rating);
-  //   setInitialReview(review);
-  //   setIsUpdated(false);
-  // };
+    setInitialRating(rating);
+    setInitialReview(review);
+    setIsUpdated(false);
+  };
 
   const title = details?.title || details?.name;
   const releaseDate = type === "movie" ? details?.release_date : details?.first_air_date;
@@ -185,14 +193,14 @@ export default function Details() {
             <View className="flex flex-row mb-6">
               <View className="flex items-center ml-4 mr-4">
                 <CircularProgress
-                  //{ratingToPercentage(details?.vote_average)}
+                  {...ratingToPercentage(details?.vote_average)}
                   value={50}
                   radius={35}
                   duration={200}
                   progressValueColor={'#ecf0f1'}
                   maxValue={100}
                   titleColor={'white'}
-                  titleStyle={{fontWeight: 'bold'}}
+                  titleStyle={{ fontWeight: 'bold' }}
                   valueSuffix={'%'}
                   activeStrokeColor={'#0284c7'}
                   activeStrokeSecondaryColor={'#082f49'}
@@ -202,16 +210,15 @@ export default function Details() {
 
               <View className="flex items-center ml-4 mr-4">
                 <CircularProgress
-                  //{averageRating / 10}
-                  value={5}
+                  value={averageRating}
                   radius={35}
                   duration={100}
                   progressValueColor={'#ecf0f1'}
                   maxValue={10}
                   titleColor={'white'}
-                  titleStyle={{fontWeight: 'bold'}}
+                  titleStyle={{ fontWeight: 'bold' }}
                   progressFormatter={(value) => {
-                    'worklet';                   
+                    'worklet';
                     return value.toFixed(1);
                   }}
                   activeStrokeColor={'#0284c7'}
@@ -239,7 +246,7 @@ export default function Details() {
             {isInWatchlist && !isUpdated && (
               <TouchableOpacity
                 className="bg-green-600 p-2 rounded-md flex flex-row items-center"
-              //onPress={handleRemoveFromWatchlist}
+                onPress={handleRemoveFromWatchlist}
               >
                 <Ionicons name="checkmark-circle" size={20} color="white" />
                 <Text className="text-white ml-2">In watchlist</Text>
@@ -248,7 +255,7 @@ export default function Details() {
             {!isInWatchlist && (
               <TouchableOpacity
                 className="border border-white p-2 rounded-md flex flex-row items-center"
-              //onPress={handleSaveToWatchlist}
+                onPress={handleSaveToWatchlist}
               >
                 <Ionicons name="add-circle" size={25} color="white" />
                 <Text className="text-white ml-2">Add to watchlist</Text>
@@ -257,9 +264,9 @@ export default function Details() {
             {isInWatchlist && isUpdated && (
               <TouchableOpacity
                 className="border border-blue-600 p-2 rounded-md flex flex-row items-center"
-              //onPress={handleUpdateWatchlist}
+                onPress={handleUpdateWatchlist}
               >
-                <Ionicons name="refresh-circle" size={20} color="blue" />
+                <Ionicons name="refresh-circle" size={20} color="white" />
                 <Text className="text-blue-600 ml-2">Update changes</Text>
               </TouchableOpacity>
             )}
@@ -291,7 +298,7 @@ export default function Details() {
         </View>
 
 
-        
+
         <View className="container py-4 gap-2">
           <Text className="text-lg text-gray-400 font-bold text-center">Cast</Text>
           <ScrollView horizontal className="mt-4 flex flex-row gap-4">

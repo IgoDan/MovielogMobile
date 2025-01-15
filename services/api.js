@@ -35,7 +35,7 @@ export const fetchCredits = async (type, id) => {
 
 export const fetchMovies = async (page, sortBy, releaseYear) => {
   let res;
-  if (releaseYear === 0){
+  if (releaseYear === 1){
     res = await axios.get(`${baseUrl}/discover/movie?api_key=${apiKey}&page=${page}&sort_by=${sortBy}`)
   }
   else {
@@ -49,7 +49,7 @@ export const fetchMovies = async (page, sortBy, releaseYear) => {
 
 export const fetchShows = async (page, sortBy, releaseYear) => {
   let res;
-  if (releaseYear === 0){
+  if (releaseYear === 1){
     res = await axios.get(`${baseUrl}/discover/tv?api_key=${apiKey}&page=${page}&sort_by=${sortBy}`)
   }
   else {
@@ -63,7 +63,7 @@ export const fetchShows = async (page, sortBy, releaseYear) => {
 
 export const searchMovies = async (query, page, releaseYear) => {
   let res;
-  if (releaseYear === 0){
+  if (releaseYear === 1){
     res = await axios.get(`${baseUrl}/search/movie?api_key=${apiKey}&query=${query}&page=${page}`)
   }
   else {
@@ -77,7 +77,7 @@ export const searchMovies = async (query, page, releaseYear) => {
 
 export const searchShows = async (query, page, releaseYear) => {
   let res;
-  if (releaseYear === 0){
+  if (releaseYear === 1){
     res = await axios.get(`${baseUrl}/search/tv?api_key=${apiKey}&query=${query}&page=${page}`)
   }
   else {
